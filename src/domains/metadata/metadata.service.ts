@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMetadatumDto } from './dto/create-metadatum.dto';
+import {  CreateMetaDataDto  } from './dto/create-metadatum.dto';
 import { UpdateMetadatumDto } from './dto/update-metadatum.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { MetaData } from './entities/metadata.entity';
 
 @Injectable()
 export class MetadataService {
-  create(createMetadatumDto: CreateMetadatumDto) {
-    return 'This action adds a new metadatum';
+  constructor(@InjectModel(MetaData.name) private metaDatumModel: Model<MetaData>){}
+  public async create(createMetadatumDto: CreateMetaDataDto ) {
+    return await this.metaDatumModel.create(createMetadatumDto)
   }
-
   findAll() {
     return `This action returns all metadata`;
   }

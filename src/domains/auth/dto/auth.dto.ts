@@ -24,15 +24,26 @@ export class GetOauthToken {
 export class RegisterDto {
   @ApiProperty({
     minimum: 4,
-    maximum: 100,
-    example: 'Abdalla Mohamed',
+    maximum: 50,
+    example: 'Bedo',
     type: String,
     required: true,
   })
-  @Length(4, 100)
+  @Length(1, 50)
   @IsNotEmpty()
   @IsString()
-  public readonly name: string;
+  public readonly firstName: string;
+  @ApiProperty({
+    minimum: 4,
+    maximum: 50,
+    example: 'Mohamed',
+    type: String,
+    required: false,
+  })
+  @Length(1, 50)
+  @IsOptional()
+  @IsString()
+  public readonly lastName: string;
   @ApiProperty({
     example: 'personalEmail@gmail.com',
     description: 'email address for account',
@@ -64,17 +75,6 @@ export class RegisterDto {
   public readonly phoneNumber: string;
 
   @ApiProperty({
-    minimum: 1,
-    maximum: 100,
-    example: 'Microsoft',
-    type: String,
-    required: true,
-  })
-  @IsString()
-  @Length(1, 100)
-  @IsNotEmpty()
-  public readonly companyName: string;
-  @ApiProperty({
     description: 'unique device id for example from device_info_plus libriary',
     example: 'deviceId121322',
     type: String,
@@ -91,41 +91,6 @@ export class RegisterDto {
   @IsOptional()
   @IsEmail()
   public readonly workEmail?: string;
-  @ApiProperty({
-    minimum: 2,
-    maximum: 100,
-    example: 'Software Engineer',
-    type: String,
-    required: false,
-  })
-  @IsString()
-  @Length(2, 100)
-  @IsOptional()
-  public readonly jobTitle: string;
-  @IsOptional()
-  @ApiProperty({
-    example: 'www.microsoft.com',
-    description: 'Company website must be secured with https',
-    type: String,
-    required: false,
-  })
-  @IsString()
-  @ValidateIf(
-    (o: ValidationArguments) => !o.value || o.value.includes('https'),
-    {
-      message: 'company website must be secured with https',
-    },
-  )
-  public readonly companyWebsite: string;
-  @ApiProperty({
-    description: 'logo cloud link',
-    example: 'www.logolink.com',
-    type: String,
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  public readonly companyLogo: string;
 
   @ApiProperty({
     description: 'profile picture cloud link',

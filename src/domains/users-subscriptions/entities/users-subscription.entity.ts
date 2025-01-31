@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 
 @Schema({ timestamps: true })
 export class UserSubscription {
+  @Prop({ type: mongoose.Types.ObjectId, ref: 'User' })
+  user: string;
   @Prop({ type: mongoose.Types.ObjectId, ref: 'Subscription' })
   subscription: string;
   @Prop({

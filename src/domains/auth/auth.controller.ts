@@ -1,13 +1,22 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiHeader } from '@nestjs/swagger';
 import { GetOauthToken, LoginDto, RegisterDto } from './dto/auth.dto';
 import { BasicApiDecorators } from 'src/decorators/swagger.decorators';
-import { LoginResponse, ResgisterResponse } from './auth.interface';
+import { TokensResponse } from './auth.interface';
 import { LocalAuthGuard } from './guards/local.guard';
-import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from './decorators/getUser.decorator';
+import { GetUser } from './decorators/get-user.decorator';
 import { UserDocument } from '../user/entites/user.entity';
+import { JwtRefreshAuthGuard } from './guards/refresh-token.guard';
+import { GetToken } from './decorators/get-token.decorator';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -18,14 +27,14 @@ export class AuthController {
     operation: {
       summary: 'Login existing user and returns new access and refresh tokens',
     },
-    response: LoginResponse,
+    response: TokensResponse,
     description: 'login up a new user',
   })
   @ApiBody({
-    type:LoginDto
+    type: LoginDto,
   })
-  @UseGuards(AuthGuard('local'))
-  async login(@GetUser() user: UserDocument): Promise<LoginResponse> {
+  @UseGuards(LocalAuthGuard)
+  async login(@GetUser() user: UserDocument): Promise<TokensResponse> {
     return await this.authService.login(user);
   }
   @Post('signup')
@@ -33,12 +42,32 @@ export class AuthController {
     responseCode: 200,
     isArray: false,
     operation: { summary: 'Signs up a new user' },
-    response: ResgisterResponse,
+    response: TokensResponse,
     description: 'Signs up a new user',
   })
   @ApiBody({ type: RegisterDto })
-  async signup(@Body() registerDto: RegisterDto): Promise<ResgisterResponse> {
+  async signup(@Body() registerDto: RegisterDto): Promise<TokensResponse> {
     return await this.authService.register(registerDto);
+  }
+  @Post('refresh')
+  @UseGuards(JwtRefreshAuthGuard)
+  @BasicApiDecorators({
+    responseCode: 200,
+    isArray: false,
+    operation: {
+      summary:
+        'Replace expired accessToken with a new refresh and acccess Token',
+    },
+    response: TokensResponse,
+    description: 'Replace expired refresh token',
+  })
+  @ApiHeader({
+    name: 'refresh-token', // The name of the header
+    description: 'The refresh token used to obtain a new access token', // Description for developers
+    required: true, // Indicate that this header is mandatory
+  })
+  async refresh(@GetUser() user: UserDocument, @GetToken() refreshToken): Promise<TokensResponse> {
+    return await this.authService.refresh(user,refreshToken)
   }
 
   @Get('oauth_callback')

@@ -1,10 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Exclude, Expose } from 'class-transformer';
-import { BASIC_USER_KEY } from 'src/domains/auth/decorators/basic-user.decorator';
-import { ADMIN_KEY } from 'src/domains/auth/decorators/admin.decorator';
-import { TEAM_LEADER_KEY } from 'src/domains/auth/decorators/team-leader.decorator';
-import { TEAM_MEMBER_KEY } from 'src/domains/auth/decorators/team-member.decorator';
-import { PREMIUM_USER_KEY } from 'src/domains/auth/decorators/premium-user.decorator';
 import * as bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 export type UserDocument = User & Document;
@@ -17,9 +12,11 @@ export class LoginInfo {
 @Schema({ timestamps: true })
 @Expose()
 export class User {
-  _id:string
+   _id:mongoose.Types.ObjectId
   @Prop({ required: true, type: String })
   firstName: string;
+  @Prop({ required: false, type: String })
+  lastName: string;
   @Prop({ required: true, type: String })
   email: string;
   @Exclude()
@@ -31,24 +28,32 @@ export class User {
   workEmail: string;
   @Prop({ required: false, type: String })
   profilePicture: string;
-  @Prop({ required: false, type: [String], enum:[BASIC_USER_KEY,PREMIUM_USER_KEY,TEAM_LEADER_KEY,TEAM_MEMBER_KEY,ADMIN_KEY],default:BASIC_USER_KEY })
-  roles: string[];
+  @Prop({
+    required: false,
+    type: mongoose.Types.ObjectId,
+    ref: 'UserSubscription',
+  })
+  subscription: string;
   @Prop({ required: false, type: String })
   activeRefreshToken: string;
+  @Prop({ type: [{ isSharedBack: Boolean, card: String,sharedBackDate:Date }] })
+  contacts: string[];
   passwordCheck: (password: string) => boolean;
-  revokeRefreshToken: () => void
-  saveRefreshToken:(refreshToken:string)=>void
+  revokeRefreshToken: () => void;
+  saveRefreshToken: (refreshToken: string) => void;
 }
 export const userSchema = SchemaFactory.createForClass(User);
-userSchema.methods.revokeRefreshToken = function ():void {
+userSchema.methods.revokeRefreshToken = function (): void {
   this.activeRefreshToken = null;
-  return this.save()
-}
-userSchema.methods.saveRefreshToken = function (refreshToken:string):void {
+  return this.save();
+};
+userSchema.methods.saveRefreshToken = function (refreshToken: string): void {
   this.activeRefreshToken = refreshToken;
-  return this.save()
-}
-userSchema.methods.passwordCheck = async function (password: string): Promise<boolean> {
+  return this.save();
+};
+userSchema.methods.passwordCheck = async function (
+  password: string,
+): Promise<boolean> {
   return await bcrypt.compare(password, this.hashedPassword);
 };
 userSchema.pre('save', async function (next) {

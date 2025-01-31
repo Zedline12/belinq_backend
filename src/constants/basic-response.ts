@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ResgisterResponse } from 'src/domains/auth/auth.interface';
+import {  TokensResponse } from 'src/domains/auth/auth.interface';
 
 export class BasicResponse {
   @ApiProperty({

@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -6,11 +6,17 @@ import configFunc from './config/configration';
 import { AuthModule } from './domains/auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './domains/user/user.module';
+import { CardsModule } from './domains/cards/cards.module';
+import { MetadataModule } from './domains/metadata/metadata.module';
+import { SubscriptionPlansModule } from './domains/subscription-plans/subscription-plans.module';
 
 @Module({
   imports: [
-     UserModule,
+    UserModule,
     AuthModule,
+    CardsModule,
+    MetadataModule,
+    SubscriptionPlansModule,
     ConfigModule.forRoot({ load: [configFunc] }),
     MongooseModule.forRoot(
       'mongodb+srv://bedomohamed307:bedo3077@benova.vakc3.mongodb.net/',

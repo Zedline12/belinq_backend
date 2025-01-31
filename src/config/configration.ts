@@ -15,6 +15,13 @@ const configration: Configration = {
       redirectUri: process.env.OAUTH_REDIRECT_URI,
     },
   },
+  wallets: {
+    googleWallet: {
+      issuerId: process.env.GOOGLE_WALLET_ISSUER_ID,
+      issuerEmail: process.env.GOOGLE_WALLET_ISSUER_EMAIL,
+      serviceAccountPrivateKey:process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+    }
+  }
 };
 const configFunc: ConfigFactory<Configration> = () => configration;
 export default configFunc;

@@ -1,10 +1,8 @@
-import { Prop } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
-
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+export type SubscriptionPlanDocument = SubscriptionPlan & Document;
+@Schema({ timestamps: true })
 export class SubscriptionPlan {
-  @Prop({ type: mongoose.Types.ObjectId })
-  _id: string;
-  @Prop({ required: true, type: String })
+  @Prop({ required: true, type: String, enum: ['premium', 'teams'] })
   name: string;
   @Prop({ required: true, type: Number })
   monthlyPayment: number;
@@ -13,3 +11,5 @@ export class SubscriptionPlan {
   @Prop({ required: true, type: Number })
   annualPayment: number;
 }
+export const SubscriptionPlanSchema =
+  SchemaFactory.createForClass(SubscriptionPlan);

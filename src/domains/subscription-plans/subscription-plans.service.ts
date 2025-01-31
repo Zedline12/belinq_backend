@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSubscriptionPlanDto } from './dto/create-subscription-plan.dto';
 import { UpdateSubscriptionPlanDto } from './dto/update-subscription-plan.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { SubscriptionPlan } from './entities/subscription-plan.entity';
 
 @Injectable()
 export class SubscriptionPlansService {
-  create(createSubscriptionPlanDto: CreateSubscriptionPlanDto) {
-    return 'This action adds a new subscriptionPlan';
+  constructor(@InjectModel(SubscriptionPlan.name) private subscriptionPlanModel: Model<SubscriptionPlan>,){}
+  public async create(createSubscriptionPlanDto: CreateSubscriptionPlanDto) {
+    return await this.subscriptionPlanModel.create(createSubscriptionPlanDto)
   }
 
   findAll() {

@@ -5,10 +5,9 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model, mongo, ObjectId } from 'mongoose';
 import { User, UserDocument } from './entites/user.entity';
 import {
-  COMPANY_USER_CONFLICT,
   EMAIL_USER_CONFLICT,
   PHONE_USER_CONFLICT,
 } from 'src/errors/erros.constant';
@@ -23,46 +22,58 @@ export class UserService {
     private readonly authService: AuthService,
   ) {}
   public async create(
-    name: string,
+    firstName: string,
+    lastName: string,
     email: string,
     hashedPassword: string,
     phoneNumber: string,
-    companyName: string,
     workEmail?: string,
-    jobTitle?: string,
-    companyWebsite?: string,
-    companyLogo?: string,
     profilePicture?: string,
     activeRefreshToken?: string,
   ): Promise<User> {
     const testUser = await this.userModel.findOne({
-      $or: [{ email }, { phoneNumber }, { companyName }],
+      $or: [{ email }, { phoneNumber }],
     });
     if (testUser) {
-
       if (testUser.email == email) {
         throw new ConflictException(EMAIL_USER_CONFLICT);
       }
       if (testUser.phoneNumber == phoneNumber) {
         throw new ConflictException(PHONE_USER_CONFLICT);
       }
-    
     }
     return await this.userModel.create({
-      name,
+      firstName,
+      lastName,
       email,
       hashedPassword,
       phoneNumber,
-      companyName,
       workEmail,
-      jobTitle,
-      companyWebsite,
-      companyLogo,
       profilePicture,
       activeRefreshToken,
     });
   }
+  public async checkPremiumSubscription(userId:mongoose.Types.ObjectId): Promise<void> {
+    const user = (await this.userModel.findById(userId).populate('subscription'))
+    console.log(user)
+  }
+  public async getValidateUserByBasicAuth(
+    email: string,
+    password: string,
+  ): Promise<UserDocument | null> {
+    const user = await this.findUser({ email });
+    if (user && (await user.passwordCheck(password))) {
+      return user;
+    }
+    return null;
+  }
+  public async subscribe(userId:mongoose.Types.ObjectId, subscriptionId:mongoose.Types.ObjectId): Promise<void> {
+    
+  }
 
+  public async findUserById(id:mongoose.Types.ObjectId): Promise<UserDocument | null> {
+    return await this.userModel.findById(id);
+  }
   public async findUserByEmail(email: string): Promise<UserDocument | null> {
     return await this.userModel.findOne({ email });
   }
