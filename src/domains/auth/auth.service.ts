@@ -10,6 +10,8 @@ import { RegisterDto } from './dto/auth.dto';
 import { UserDocument } from '../user/entites/user.entity';
 import { TokensResponse } from './auth.interface';
 import { INVALLID_STOLEN_TOKEN } from 'src/errors/erros.constant';
+import mongoose from 'mongoose';
+import { UsersSubscriptionsService } from '../users-subscriptions/users-subscriptions.service';
 @Injectable()
 export class AuthService {
   private config: Configration['auth'];
@@ -18,6 +20,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly jwt: JwtService,
     private readonly userService: UserService,
+    private readonly userSubscriptionService:UsersSubscriptionsService
   ) {
     const config = this.configService.get<Configration['auth']>('auth');
     LogEmptyOrNullProperty(config, this.logger);
@@ -30,21 +33,30 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
   public async register(registerDto: RegisterDto): Promise<TokensResponse> {
-    const signedUser = await this.userService.create(
-      registerDto.firstName,
-      registerDto.lastName,
-      registerDto.email,
-      registerDto.password,
-      registerDto.phoneNumber,
-      registerDto.workEmail,
-      registerDto.profilePicture,
-    );
-    const accessToken = await this.generateAccessToken(
-      signedUser._id.toString(),
-    );
-    const refreshToken = await this.generateRefreshToken(signedUser._id.toString());
-    signedUser.saveRefreshToken(refreshToken);
-    return { accessToken, refreshToken };
+   
+    try {
+      const signedUser = await this.userService.create(
+        registerDto.firstName,
+        registerDto.lastName,
+        registerDto.email,
+        registerDto.password,
+        registerDto.phoneNumber,
+        registerDto.workEmail,
+        registerDto.profilePicture,
+      );
+      await this.userSubscriptionService.createSubscription(signedUser._id)
+      const accessToken = await this.generateAccessToken(
+        signedUser._id.toString(),
+      );
+      const refreshToken = await this.generateRefreshToken(signedUser._id.toString());
+      signedUser.saveRefreshToken(refreshToken);
+      return { accessToken, refreshToken };
+
+    } catch (error) {
+      throw error;
+    } finally {
+     
+    }
   }
   public async validateRefreshToken(user:UserDocument,refreshToken: string):Promise<void> {
       if(user.activeRefreshToken!=refreshToken) throw new UnauthorizedException(INVALLID_STOLEN_TOKEN)

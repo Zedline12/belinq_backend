@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Exclude, Expose } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
+import { ApiProperty } from '@nestjs/swagger';
 export type UserDocument = User & Document;
 @Schema({ timestamps: true })
 export class LoginInfo {
@@ -12,32 +13,39 @@ export class LoginInfo {
 @Schema({ timestamps: true })
 @Expose()
 export class User {
-   _id:mongoose.Types.ObjectId
+  _id: mongoose.Types.ObjectId;
+  @ApiProperty({ type: String, required: true, example: 'Abdallah' })
   @Prop({ required: true, type: String })
   firstName: string;
+  @ApiProperty({ type: String, required: false, example: 'Mohamed' })
   @Prop({ required: false, type: String })
-  lastName: string;
+  lastName?: string;
   @Prop({ required: true, type: String })
+  @ApiProperty({ type: String, required: true, example: 'email' })
   email: string;
+  @ApiProperty({ type: [String], required: false,description:"List of teams ids that user in refers the team entity", example:["54645645665456","675645656456"] })
+  @Prop({ required: false, type: [mongoose.Types.ObjectId], ref: 'Team' })
+  teams?: string[];
   @Exclude()
   @Prop({ required: true, type: String })
   hashedPassword: string;
-  @Prop({ required: true, type: Number })
+  @Prop({ required: false, type: String })
+  @ApiProperty({ type: String, required: false,description:"phone number with E.164 format",example:["+201099772095"] })
   phoneNumber: string;
+  @ApiProperty({ type: String, required: false,example:"bedomohamed307@gmail.com" })
   @Prop({ required: false, type: String })
-  workEmail: string;
+  workEmail?: string;
   @Prop({ required: false, type: String })
-  profilePicture: string;
+  @ApiProperty({ type: String, required: false,example:"http://www.example.com",description:"Profile Picutre Link" })
+  profilePicture?: string;
+  @Prop({ required: false, type: String })
+  activeRefreshToken?: string;
   @Prop({
     required: false,
-    type: mongoose.Types.ObjectId,
-    ref: 'UserSubscription',
+    type: [{ isSharedBack: Boolean, card: String, sharedBackDate: Date }],
   })
-  subscription: string;
-  @Prop({ required: false, type: String })
-  activeRefreshToken: string;
-  @Prop({ type: [{ isSharedBack: Boolean, card: String,sharedBackDate:Date }] })
-  contacts: string[];
+  @ApiProperty({ type: [String], required: false,example:["cardId1","cardId2"] })
+  contacts?: string[];
   passwordCheck: (password: string) => boolean;
   revokeRefreshToken: () => void;
   saveRefreshToken: (refreshToken: string) => void;

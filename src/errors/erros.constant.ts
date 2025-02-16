@@ -5,6 +5,7 @@ export const CARD_NOT_FOUND = '404002 Card not found';
 export const INVALID_TOKEN = '401001 Invalid token';
 export const INVALLID_STOLEN_TOKEN = '401001 Invalid stolen token is regonized and you are blocked';
 export const INVALID_CREDINTALS = '401002 Email or password is incorrect';
+export const INVALID_TEAM_MEMBER='401003 You are not a member of this team';
 //bad request exceptions 400
 export const NO_TOKEN_PROVIDED = '400001 No token provided';
 

@@ -17,4 +17,12 @@ export interface Configration {
       serviceAccountPrivateKey: string;
     };
   };
+  email: {
+    transport?: {
+      auth: {
+        user: string;
+        pass: string;
+      };
+    };
+  };
 }

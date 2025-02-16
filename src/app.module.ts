@@ -9,12 +9,14 @@ import { UserModule } from './domains/user/user.module';
 import { CardsModule } from './domains/cards/cards.module';
 import { MetadataModule } from './domains/metadata/metadata.module';
 import { SubscriptionPlansModule } from './domains/subscription-plans/subscription-plans.module';
+import { TeamsModule } from './domains/teams/teams.module';
 
 @Module({
   imports: [
     UserModule,
     AuthModule,
     CardsModule,
+    TeamsModule,
     MetadataModule,
     SubscriptionPlansModule,
     ConfigModule.forRoot({ load: [configFunc] }),

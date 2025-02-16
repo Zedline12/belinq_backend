@@ -6,7 +6,7 @@ import {
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import mongoose, { Model, ObjectId} from 'mongoose';
-import { Card } from './entities/card.entity';
+import { Card, CardType } from './entities/card.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserDocument } from '../user/entites/user.entity';
 import { ConfigService } from '@nestjs/config';
@@ -14,6 +14,7 @@ import { Configration } from 'src/config/configration.interface';
 import * as jwt from 'jsonwebtoken';
 import { CARD_NOT_FOUND } from 'src/errors/erros.constant';
 import { UserService } from '../user/user.service';
+import { TeamMember } from '../teams/entities/team.entity';
 @Injectable()
 export class CardsService {
   private readonly googleWalletConfig: Configration['wallets']['googleWallet'];
@@ -181,8 +182,9 @@ export class CardsService {
       throw new BadRequestException(err);
     }
   }
+  
   public async update(userId:mongoose.Types.ObjectId, cardId: string, updateCardDto: UpdateCardDto) {
-  if(updateCardDto.backgroundColor) this.userService.checkPremiumSubscription(userId)
+  
   }
   public async getCardById(cardId: string) {
     return await this.cardModel.findById(new mongoose.Types.ObjectId(cardId));
@@ -192,6 +194,25 @@ export class CardsService {
     createCardDto: CreateCardDto,
   ): Promise<any> {
     return await this.cardModel.create({ ...createCardDto, user: user._id });
+  }
+  public async createTeamMembersCards(owner: mongoose.Types.ObjectId, teamId: mongoose.Types.ObjectId, teamMembers: TeamMember[]) { 
+    const bulkOperations = teamMembers.map((user, index) => ({
+      insertOne: {
+        document: {
+          owner: owner,
+          type: CardType.TEAM,
+          assignedTo: user.user,
+          team: teamId,
+          qrImageView:"https://"
+       }
+      },
+    }));
+    try {
+      const result = await this.cardModel.bulkWrite(bulkOperations);
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 
   findAll() {

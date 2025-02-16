@@ -14,8 +14,10 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { UserDocument } from '../user/entites/user.entity';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/access-token.guard';
-import mongoose, { ObjectId } from 'mongoose';
-@UseGuards(JwtAuthGuard)
+import { RequiredSubscription } from '../users-subscriptions/decorators/user-subscription.decorator';
+import { SubscriptionPlanType } from '../subscription-plans/entities/subscription-plan.entity';
+import { UserSubscriptionGuard } from '../users-subscriptions/guards/user-subscription.guard';
+@UseGuards(JwtAuthGuard,UserSubscriptionGuard)
 @Controller('cards')
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
@@ -27,14 +29,15 @@ export class CardsController {
   ) {
     return await this.cardsService.create(user, createCardDto);
   }
+  @Patch(':id')
+  async update(@GetUser() user: UserDocument, @Param('id') cardId: string, @Body() updateCardDto: UpdateCardDto) {
+    
+  }
   @Get(':id/wallet-link')
   getwalletLink(@Param('id') cardId: string): Promise<String> {
     return this.cardsService.getWalletLink(cardId);
   }
-  @Patch(':id')
-  update(@GetUser() user: UserDocument, @Param('id') cardId: string, @Body() updateCardDto: UpdateCardDto) {
-    return this.cardsService.update(user._id  ,cardId, updateCardDto);
-  }
+  @RequiredSubscription(SubscriptionPlanType.TEAMS)
   @Get()
   findAll() {
     // const ability = this.caslAbilityFactory.createForUser(new User());

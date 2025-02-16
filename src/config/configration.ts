@@ -19,9 +19,17 @@ const configration: Configration = {
     googleWallet: {
       issuerId: process.env.GOOGLE_WALLET_ISSUER_ID,
       issuerEmail: process.env.GOOGLE_WALLET_ISSUER_EMAIL,
-      serviceAccountPrivateKey:process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
-    }
-  }
+      serviceAccountPrivateKey: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+    },
+  },
+  email: {
+    transport: {
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+      },
+    },
+  },
 };
 const configFunc: ConfigFactory<Configration> = () => configration;
 export default configFunc;

@@ -88,4 +88,7 @@ export class UserService {
   ): Promise<UserDocument | null> {
     return await this.userModel.findOne(query);
   }
+  public async find(query: Partial<Record<keyof User, string | number | {}>>) {
+    return await this.userModel.find(query);
+  }
 }
