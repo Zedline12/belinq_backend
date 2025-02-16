@@ -54,15 +54,23 @@ async function ProductionMode(app: INestApplication<any>) {
   app.use(helmet({ hidePoweredBy: true }));
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '200mb' }));
-  app.enableCors({
-    origin: function (origin, callback) {
-      if (!origin || whitelist.indexOf(origin) !== -1) {
-        callback(null, origin);
-      } else callback(new Error('Not allowed by CORS'));
-    },
+  const swaggerConfig = new DocumentBuilder()
+  .setTitle('Belinq API')
+  .setDescription('The Main Api Documentation for Belinq.')
+  .setVersion('1.0.0')
+  .addBearerAuth()
+  .build();
+const document = SwaggerModule.createDocument(app, swaggerConfig);
+SwaggerModule.setup('/api/docs', app, document);
+  // app.enableCors({
+  //   origin: function (origin, callback) {
+  //     if (!origin || whitelist.indexOf(origin) !== -1) {
+  //       callback(null, origin);
+  //     } else callback(new Error('Not allowed by CORS'));
+  //   },
 
-    credentials: true,
-  });
+  //   credentials: true,
+  // });
 
   // app.useGlobalFilters(new AllExceptionsFilterProduction());
 }
