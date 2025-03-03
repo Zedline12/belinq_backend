@@ -91,17 +91,17 @@ export class TeamsService {
     //   (member) => member.user.toString() === userid.toString(),
     // );
     // if (!member) return null;
-    // if (member.access === TeamMemberAccess.EDITOR)
+    // if (member.access === member.role)
     //   return TeamRole.TeamMemberEditor;
     // if (member.access === TeamMemberAccess.VIEWER)
     return TeamRole.TeamMemberViewer;
   }
   findAll() {
-    return `This action returns all teams`;
+    return this.teamModel.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} team`;
+    return this.teamModel.findById(id);
   }
 
   // update(id: number, updateTeamDto: UpdateTeamDto) {
@@ -109,6 +109,6 @@ export class TeamsService {
   // }
 
   remove(id: number) {
-    return `This action removes a #${id} team`;
+    return this.teamModel.deleteOne({ _id: id });
   }
 }

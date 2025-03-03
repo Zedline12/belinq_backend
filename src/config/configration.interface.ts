@@ -25,4 +25,9 @@ export interface Configration {
       };
     };
   };
+  payments: {
+    stripe: {
+      secretKey: string;
+    }
+  }
 }

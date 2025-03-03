@@ -5,11 +5,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, userSchema } from './entites/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
+import { CacheModule } from '../cache/cache.module';
 @Module({
   imports: [
     forwardRef(() => AuthModule),
     MongooseModule.forFeature([{ name:User.name, schema: userSchema }]),
     ConfigModule,
+    CacheModule
   ],
   controllers: [UserController],
   providers: [UserService],

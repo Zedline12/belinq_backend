@@ -30,6 +30,11 @@ const configration: Configration = {
       },
     },
   },
+  payments: {
+    stripe: {
+      secretKey:process.env.STRIPE_SECRET_KEY 
+    }
+  }
 };
 const configFunc: ConfigFactory<Configration> = () => configration;
 export default configFunc;
