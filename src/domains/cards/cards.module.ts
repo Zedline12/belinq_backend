@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { CardsController } from './cards.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -10,7 +10,7 @@ import { UsersSubscriptionsModule } from '../users-subscriptions/users-subscript
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{name: Card.name, schema: cardSchema}]),ConfigModule,JwtModule,UserModule,UsersSubscriptionsModule
+    MongooseModule.forFeature([{name: Card.name, schema: cardSchema}]),ConfigModule,JwtModule,UsersSubscriptionsModule
   ],
   controllers: [CardsController],
   providers: [CardsService],

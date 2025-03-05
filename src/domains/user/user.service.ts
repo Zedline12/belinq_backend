@@ -1,6 +1,7 @@
 import {
   ConflictException,
   forwardRef,
+  HttpException,
   Inject,
   Injectable,
 } from '@nestjs/common';
@@ -14,6 +15,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth/auth.service';
 import { CacheService, CacheType } from '../cache/cache.service';
+import { GetHomePageResponse } from './dto/user.dto';
+import { CardsService } from '../cards/cards.service';
 @Injectable()
 export class UserService {
   constructor(
@@ -21,8 +24,12 @@ export class UserService {
     private configService: ConfigService,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
-    private readonly cacheService:CacheService
-  ) {}
+    private readonly cacheService: CacheService,
+    private readonly cardService:CardsService
+  ) { }
+  public async getHomePage(userId:mongoose.Types.ObjectId): Promise<GetHomePageResponse> {
+    return { cards: await this.cardService.findAllByUserId(userId) }
+  }
   public async create(
     firstName: string,
     lastName: string,
@@ -55,6 +62,12 @@ export class UserService {
       activeRefreshToken,
     });
   }
+  public async changeUserEmail(id:mongoose.Types.ObjectId, email: string): Promise<HttpException | string> {
+    const emailExists = await this.userModel.findOne({ email })
+    if (emailExists) throw new ConflictException(EMAIL_USER_CONFLICT)
+    await this.userModel.updateOne({ _id: id }, { email })
+    return 'Email updated successfully'
+  }
   public async checkPremiumSubscription(userId:mongoose.Types.ObjectId): Promise<void> {
     const user = (await this.userModel.findById(userId).populate('subscription'))
     console.log(user)
@@ -74,18 +87,9 @@ export class UserService {
   }
 
   public async findUserById(id: mongoose.Types.ObjectId): Promise<UserDocument | null > {
-    const cacheKey = this.cacheService.getCacheKey(CacheType.USER, id.toString());
-    const cachedUser = await this.cacheService.get(cacheKey);
-    if (cachedUser) {
-     
-    }
-
+   
     // 2️⃣ Fetch from Database if not in cache
-    const user = await this.userModel.findById(id);
-    if (user) {
-      await this.cacheService.set(cacheKey, user, 3600); // Cache for 1 hour
-    }
-    return user;
+    return await this.userModel.findById(id);
   }
   public async findUserByEmail(email: string): Promise<UserDocument | null> {
     return await this.userModel.findOne({ email });

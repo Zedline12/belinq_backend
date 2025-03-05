@@ -5,30 +5,30 @@ export enum CacheType {
 }
 @Injectable()
 export class CacheService {
-  private redisClient: Redis;
+  // private redisClient: Redis;
 
-  constructor() {
-    this.redisClient = new Redis({ host: 'localhost', port: 6379 }); // Adjust as needed
-  }
+  // constructor() {
+  //   this.redisClient = new Redis({ host: 'localhost', port: 6379 }); // Adjust as needed
+  // }
 
-  async set(key: string, value: any, ttl?: number) {
-    const data = JSON.stringify(value);
-    if (ttl) {
-      await this.redisClient.setex(key, ttl, data); // Set with expiration
-    } else {
-      await this.redisClient.set(key, data);
-    }
-  }
+  // async set(key: string, value: any, ttl?: number) {
+  //   const data = JSON.stringify(value);
+  //   if (ttl) {
+  //     await this.redisClient.setex(key, ttl, data); // Set with expiration
+  //   } else {
+  //     await this.redisClient.set(key, data);
+  //   }
+  // }
 
-  async get(key: string) {
-    const data = await this.redisClient.get(key);
-    return data ? JSON.parse(data) : null;
-  }
+  // async get(key: string) {
+  //   const data = await this.redisClient.get(key);
+  //   return data ? JSON.parse(data) : null;
+  // }
 
-  async del(key: string) {
-    await this.redisClient.del(key);
-  }
-  getCacheKey(CacheType: CacheType, id: string): string {
-    return `${CacheType}:${id}`;
-  }
+  // async del(key: string) {
+  //   await this.redisClient.del(key);
+  // }
+  // getCacheKey(CacheType: CacheType, id: string): string {
+  //   return `${CacheType}:${id}`;
+  // }
 }

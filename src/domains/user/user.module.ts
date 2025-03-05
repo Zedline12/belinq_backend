@@ -6,12 +6,14 @@ import { User, userSchema } from './entites/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
 import { CacheModule } from '../cache/cache.module';
+import { CardsModule } from '../cards/cards.module';
 @Module({
   imports: [
     forwardRef(() => AuthModule),
     MongooseModule.forFeature([{ name:User.name, schema: userSchema }]),
     ConfigModule,
-    CacheModule
+    CacheModule,
+    forwardRef(() => CardsModule),
   ],
   controllers: [UserController],
   providers: [UserService],

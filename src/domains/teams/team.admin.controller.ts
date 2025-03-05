@@ -15,37 +15,21 @@ import { TeamRolesGuard } from '../auth/guards/team-roles.guard';
 import { TeamRoles } from '../auth/decorators/roles.decorator';
 import { TeamRole } from '../auth/constants/constants';
 import { BasicApiDecorators } from 'src/decorators/swagger.decorators';
+import mongoose from 'mongoose';
 @UseGuards(JwtAuthGuard)
 @Controller('teams')
 export class TeamsController {
   constructor(private readonly teamsService: TeamsService) {}
 
-  @Post()
-      @BasicApiDecorators({
-        responseCode: 200,
-        isArray: false,
-        operation: {
-          summary: 'Creates a new team',
-        },
-        response:CreateTeamResponseDto,
-        
-        description: 'Creates a new team with members and admin with minimum of 3 members and one amdin',
-      })
-    
-  create(@GetUser() user, @Body() createTeamDto: CreateTeamDto):Promise<CreateTeamResponseDto> {
-     return  this.teamsService.create(user, createTeamDto);
-  }
 
-  @Get()
+
+  @Get(":id/users")
   @UseGuards(TeamRolesGuard)
-  async findAll(@GetUser() user) {
-    return await this.teamsService.findAll();
+  async findAll(@GetUser() user,@Param('id') teamId: string) {
+      return await this.teamsService.getAllMembers(new mongoose.Types.ObjectId(teamId));
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.teamsService.findOne(+id);
-  }
+
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateTeamDto) {

@@ -21,7 +21,6 @@ export class CardsService {
   constructor(
     @InjectModel(Card.name) private cardModel: Model<Card>,
     private readonly configService: ConfigService,
-    private readonly userService: UserService,
   ) {
     this.googleWalletConfig = this.configService.get<
       Configration['wallets']['googleWallet']
@@ -218,7 +217,9 @@ export class CardsService {
   findAll() {
     return `This action returns all cards`;
   }
-
+  async findAllByUserId(userId: mongoose.Types.ObjectId) {
+     return await this.cardModel.find({ user: userId });
+   }
   async findOne(id: string) {
     const card = await this.cardModel.find(new mongoose.Types.ObjectId(id));
     return card;

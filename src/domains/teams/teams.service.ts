@@ -99,6 +99,9 @@ export class TeamsService {
   findAll() {
     return this.teamModel.find();
   }
+  async getAllMembers(teamId:mongoose.Types.ObjectId) {
+    return await this.teamModel.findById(teamId).projection({members:1});
+  }
 
   findOne(id: number) {
     return this.teamModel.findById(id);
