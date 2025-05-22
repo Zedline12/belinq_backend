@@ -17,7 +17,7 @@ import { JwtAuthGuard } from '../auth/guards/access-token.guard';
 import { RequiredSubscription } from '../users-subscriptions/decorators/user-subscription.decorator';
 import { SubscriptionPlanType } from '../subscription-plans/entities/subscription-plan.entity';
 import { UserSubscriptionGuard } from '../users-subscriptions/guards/user-subscription.guard';
-@UseGuards(JwtAuthGuard,UserSubscriptionGuard)
+@UseGuards(JwtAuthGuard, UserSubscriptionGuard)
 @Controller('cards')
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
@@ -27,12 +27,18 @@ export class CardsController {
     @GetUser() user: UserDocument,
     @Body() createCardDto: CreateCardDto,
   ) {
-    return await this.cardsService.create(user, createCardDto);
+    return await this.cardsService.create(user, {
+      ...createCardDto,
+      image:
+        'https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg',
+    });
   }
   @Patch(':id')
-  async update(@GetUser() user: UserDocument, @Param('id') cardId: string, @Body() updateCardDto: UpdateCardDto) {
-    
-  }
+  async update(
+    @GetUser() user: UserDocument,
+    @Param('id') cardId: string,
+    @Body() updateCardDto: UpdateCardDto,
+  ) {}
   @Get(':id/wallet-link')
   getwalletLink(@Param('id') cardId: string): Promise<String> {
     return this.cardsService.getWalletLink(cardId);
@@ -43,8 +49,6 @@ export class CardsController {
     // const ability = this.caslAbilityFactory.createForUser(new User());
     return '';
   }
-
- 
 
   @Delete(':id')
   remove(@Param('id') id: string) {

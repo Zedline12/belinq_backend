@@ -13,6 +13,14 @@ export class CreateCardDto {
   @ApiProperty({
     type: String,
     required: true,
+    name: 'image',
+  })
+  @IsNotEmpty()
+  @IsString()
+  public readonly image: string;
+  @ApiProperty({
+    type: String,
+    required: true,
     name: 'firstName',
   })
   @IsNotEmpty()
@@ -52,7 +60,7 @@ export class CreateCardDto {
   @IsOptional()
   @IsString()
   @ApiProperty({
-   description:"hex background color,the default is white",
+    description: 'hex background color,the default is white',
     example: '#ffffff',
     type: String,
     required: false,
